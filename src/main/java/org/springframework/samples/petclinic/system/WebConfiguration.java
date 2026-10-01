@@ -17,23 +17,25 @@ package org.springframework.samples.petclinic.system;
 
 import org.springframework.boot.web.server.MimeMappings;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.UrlHandlerFilter;
 
 @Configuration(proxyBeanMethods = false)
 class WebConfiguration {
 
 	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE + 1)
-	UrlHandlerFilter trailingSlashFilter() {
-		return UrlHandlerFilter.trailingSlashHandler("/owners", "/owners/find", "/owners/new", "/owners/{ownerId}",
-				"/owners/{ownerId}/edit", "/owners/{ownerId}/pets/new", "/owners/{ownerId}/pets/{petId}/edit",
-				"/owners/{ownerId}/pets/{petId}/visits/new", "/vets", "/vets.html", "/oups", "/resources/**",
-				"/webjars/**").wrapRequest().build();
+	FilterRegistrationBean<UrlHandlerFilter> trailingSlashFilter() {
+		UrlHandlerFilter filter = UrlHandlerFilter.trailingSlashHandler("/owners", "/owners/find", "/owners/new",
+				"/owners/{ownerId}", "/owners/{ownerId}/edit", "/owners/{ownerId}/pets/new",
+				"/owners/{ownerId}/pets/{petId}/edit", "/owners/{ownerId}/pets/{petId}/visits/new", "/vets",
+				"/vets.html", "/oups", "/resources/**", "/webjars/**").wrapRequest().build();
+		FilterRegistrationBean<UrlHandlerFilter> registration = new FilterRegistrationBean<>(filter);
+		registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+		return registration;
 	}
 
 	@Bean
